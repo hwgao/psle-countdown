@@ -5,8 +5,10 @@
 - `index.html` contains the HTML markup and loads `styles.css` and `app.js` (vanilla JS).
 - `styles.css` contains all CSS.
 - `app.js` contains all client-side JavaScript (Firebase + app logic).
+- `firebase-config.js` contains your Firebase web config and should not be committed; create it from `firebase-config.example.js`.
 - There is no build system, bundler, or separate asset pipeline. Any new assets (images, icons) should be added as files at the repo root or under a new `assets/` folder and referenced relatively (e.g., `assets/logo.png`).
-- Firebase Firestore is used for persistence; configuration lives in `app.js` under `firebaseConfig`.
+- Firebase Firestore is used for persistence; configuration is loaded from `firebase-config.js` via `window.firebaseConfig`.
+- Netlify deploys generate `firebase-config.js` at build time via `netlify-build.sh` using environment variables (see `netlify.toml`).
 
 ## Build, Test, and Development Commands
 

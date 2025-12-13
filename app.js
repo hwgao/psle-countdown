@@ -153,16 +153,18 @@ function togglePsleInfo() {
 })();
 
 // Initialize Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyDVXsfyCpDut_0XzdFD_vvpOSmdAVLp3B4",
-  authDomain: "psle-countdown.firebaseapp.com",
-  projectId: "psle-countdown",
-  storageBucket: "psle-countdown.firebasestorage.app",
-  messagingSenderId: "7190916340",
-  appId: "1:7190916340:web:22031bf5fe3efa532cc2a1",
-};
+const firebaseConfig = window.firebaseConfig;
+if (!firebaseConfig || !firebaseConfig.projectId) {
+  const authStatus = document.getElementById("authStatus");
+  if (authStatus) {
+    authStatus.textContent =
+      'Missing Firebase config. Create `firebase-config.js` from `firebase-config.example.js`.';
+  }
+  throw new Error(
+    "Missing Firebase config. Create firebase-config.js from firebase-config.example.js."
+  );
+}
 
-// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const auth = firebase.auth();

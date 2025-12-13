@@ -172,11 +172,18 @@ h1 {
   margin-top: 1.25rem;
 }
 
-.psle-info p {
-  margin-bottom: 1rem;
-  line-height: 1.8;
-  opacity: 0.95;
-}
+        .psle-info p {
+            margin-bottom: 1rem;
+            line-height: 1.8;
+            opacity: 0.95;
+        }
+
+        .app-footer {
+            margin-top: 1.5rem;
+            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0.75;
+        }
 
 .psle-info ul {
   margin-left: 2rem;

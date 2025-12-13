@@ -623,10 +623,13 @@ function renderMonth(gridId, monthTitleId, year, month) {
       today.getMonth() === month &&
       today.getFullYear() === year;
     const hasTasks = tasksForDate.length > 0;
+    const hasIncompleteTasks = hasTasks && tasksForDate.some((todo) => !todo.completed);
+    const hasOnlyCompletedTasks = hasTasks && !hasIncompleteTasks;
 
     let classes = "calendar-day";
     if (isToday) classes += " today";
-    if (hasTasks) classes += " has-tasks";
+    if (hasOnlyCompletedTasks) classes += " has-completed-only";
+    else if (hasIncompleteTasks) classes += " has-tasks";
 
     days += `<div class="${classes}" onclick="showTasksForDate('${dateStr}')">${i}</div>`;
   }

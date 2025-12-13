@@ -346,6 +346,16 @@ h1 {
             box-shadow: 0 0 0 3px rgba(251, 113, 133, 0.18);
         }
 
+.calendar-day.has-completed-only {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.24), rgba(56, 189, 248, 0.2));
+            border: 1px solid rgba(34, 197, 94, 0.4);
+        }
+
+.calendar-day.has-completed-only::after {
+            background: #22c55e;
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.16);
+        }
+
 .calendar-month-title {
             letter-spacing: 0.3px;
         }
@@ -902,6 +912,25 @@ h1 {
   width: 6px;
   height: 6px;
   background: #ff6b6b;
+  border-radius: 50%;
+}
+
+.calendar-day.has-completed-only {
+  background: linear-gradient(
+    135deg,
+    rgba(88, 214, 141, 0.28),
+    rgba(72, 219, 251, 0.22)
+  );
+  border: 1px solid rgba(88, 214, 141, 0.5);
+}
+
+.calendar-day.has-completed-only::after {
+  content: "";
+  position: absolute;
+  bottom: 4px;
+  width: 6px;
+  height: 6px;
+  background: #58d68d;
   border-radius: 50%;
 }
 

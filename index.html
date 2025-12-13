@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSLE 2026 Countdown</title>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            padding: 2rem;
+            color: white;
+        }
+
+        .main-wrapper {
+            display: flex;
+            gap: 2rem;
+            max-width: 1400px;
+            width: 100%;
+        }
+
+        .container {
+            text-align: center;
+            padding: 2rem;
+            flex: 1;
+            max-width: 900px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+            opacity: 0.9;
+        }
+
+        .subject-countdowns {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .subject-countdown-item {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .subject-countdown-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+        }
+
+        .subject-countdown-item.completed {
+            opacity: 0.6;
+            background: rgba(88, 214, 141, 0.2);
+            border: 1px solid rgba(88, 214, 141, 0.4);
+        }
+
+        .countdown-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .countdown-subject {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .countdown-type {
+            font-size: 0.9rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .countdown-date {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            margin-bottom: 0.75rem;
+        }
+
+        .countdown-timer {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .countdown-unit {
+            text-align: center;
+            min-width: 70px;
+        }
+
+        .countdown-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            display: block;
+            line-height: 1;
+        }
+
+        .countdown-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.8;
+            margin-top: 0.25rem;
+        }
+
+        .countdown-completed-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-align: center;
+            color: #58d68d;
+        }
+
+        .psle-info {
+            margin-top: 3rem;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: left;
+        }
+
+        .psle-info h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .psle-info p {
+            margin-bottom: 1rem;
+            line-height: 1.8;
+            opacity: 0.95;
+        }
+
+        .psle-info ul {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .psle-info li {
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+
+        .right-panel {
+            width: 400px;
+            min-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            flex-shrink: 0;
+        }
+
+        .right-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .right-panel::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .right-panel::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+        }
+
+        .right-panel::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .todo-panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .todo-panel h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .todo-input-form {
+            margin-bottom: 1.5rem;
+        }
+
+        .todo-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            margin-bottom: 0.75rem;
+        }
+
+        .todo-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .todo-input:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .todo-subject {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+        }
+
+        .todo-subject:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .todo-subject option {
+            background: #764ba2;
+            color: white;
+        }
+
+        .todo-options {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .todo-priority,
+        .todo-deadline {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .todo-priority:focus,
+        .todo-deadline:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .todo-priority option {
+            background: #764ba2;
+            color: white;
+        }
+
+        .todo-deadline::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-add {
+            width: 100%;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .todo-list {
+            overflow-y: auto;
+            padding-right: 0.5rem;
+            max-height: 400px;
+        }
+
+        .todo-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .todo-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        .todo-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        .todo-list::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .todo-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .todo-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+        }
+
+        .todo-item.completed {
+            opacity: 0.6;
+        }
+
+        .todo-item.completed .todo-text {
+            text-decoration: line-through;
+        }
+
+        .todo-item.priority-high {
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .todo-item.priority-medium {
+            border-left: 4px solid #ffc107;
+        }
+
+        .todo-item.priority-low {
+            border-left: 4px solid #88d68d;
+        }
+
+        .todo-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #88d68d;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .todo-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .todo-text {
+            text-align: left;
+            line-height: 1.4;
+            word-break: break-word;
+            margin-bottom: 0.5rem;
+        }
+
+        .todo-meta {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        .priority-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .priority-high {
+            background: rgba(255, 107, 107, 0.3);
+            border: 1px solid rgba(255, 107, 107, 0.5);
+        }
+
+        .priority-medium {
+            background: rgba(255, 193, 7, 0.3);
+            border: 1px solid rgba(255, 193, 7, 0.5);
+        }
+
+        .priority-low {
+            background: rgba(136, 214, 141, 0.3);
+            border: 1px solid rgba(136, 214, 141, 0.5);
+        }
+
+        .deadline-display {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            background: rgba(72, 219, 251, 0.2);
+            border: 1px solid rgba(72, 219, 251, 0.4);
+            font-size: 0.75rem;
+        }
+
+        .deadline-display.overdue {
+            background: rgba(255, 107, 107, 0.3);
+            border: 1px solid rgba(255, 107, 107, 0.5);
+            font-weight: 600;
+        }
+
+        .deadline-display.soon {
+            background: rgba(255, 193, 7, 0.3);
+            border: 1px solid rgba(255, 193, 7, 0.5);
+        }
+
+        .subject-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        .subject-english {
+            background: rgba(147, 51, 234, 0.3);
+            border: 1px solid rgba(147, 51, 234, 0.5);
+            color: #e9d5ff;
+        }
+
+        .subject-mathematics {
+            background: rgba(59, 130, 246, 0.3);
+            border: 1px solid rgba(59, 130, 246, 0.5);
+            color: #dbeafe;
+        }
+
+        .subject-science {
+            background: rgba(16, 185, 129, 0.3);
+            border: 1px solid rgba(16, 185, 129, 0.5);
+            color: #d1fae5;
+        }
+
+        .subject-mother-tongue {
+            background: rgba(236, 72, 153, 0.3);
+            border: 1px solid rgba(236, 72, 153, 0.5);
+            color: #fce7f3;
+        }
+
+        .subject-general {
+            background: rgba(156, 163, 175, 0.3);
+            border: 1px solid rgba(156, 163, 175, 0.5);
+            color: #f3f4f6;
+        }
+
+        .todo-delete {
+            background: rgba(255, 107, 107, 0.3);
+            border: 1px solid rgba(255, 107, 107, 0.5);
+            color: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .todo-delete:hover {
+            background: rgba(255, 107, 107, 0.5);
+        }
+
+        .todo-count {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .calendar-panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+        }
+
+        .calendar-panel h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .calendar-month {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .btn-nav {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-nav:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.4rem;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            padding: 0.4rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            opacity: 0.8;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            font-size: 0.85rem;
+        }
+
+        .calendar-day:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .calendar-day.other-month {
+            opacity: 0.3;
+            cursor: default;
+        }
+
+        .calendar-day.other-month:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: none;
+        }
+
+        .calendar-day.today {
+            background: rgba(72, 219, 251, 0.3);
+            border: 2px solid rgba(72, 219, 251, 0.6);
+            font-weight: 700;
+        }
+
+        .calendar-day.has-tasks {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.3), rgba(255, 168, 1, 0.3));
+            border: 1px solid rgba(255, 107, 107, 0.5);
+        }
+
+        .calendar-day.has-tasks::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            width: 6px;
+            height: 6px;
+            background: #ff6b6b;
+            border-radius: 50%;
+        }
+
+        .task-popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .task-popup.active {
+            display: flex;
+        }
+
+        .popup-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .popup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .popup-header h3 {
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        .popup-close {
+            background: rgba(255, 107, 107, 0.3);
+            border: 1px solid rgba(255, 107, 107, 0.5);
+            color: white;
+            font-size: 1.5rem;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .popup-close:hover {
+            background: rgba(255, 107, 107, 0.5);
+            transform: rotate(90deg);
+        }
+
+        .popup-body {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .popup-task {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .popup-task-text {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .popup-task-meta {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 1200px) {
+            .main-wrapper {
+                flex-direction: column;
+            }
+
+            .right-panel {
+                width: 100%;
+                min-width: auto;
+                max-height: none;
+            }
+
+            .container {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .countdown {
+                gap: 1rem;
+            }
+
+            .time-box {
+                min-width: 80px;
+                padding: 1.5rem 1rem;
+            }
+
+            .time-value {
+                font-size: 2.5rem;
+            }
+
+            body {
+                padding: 1rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-wrapper">
+    <div class="container">
+        <h1>PSLE 2026 Countdown</h1>
+        <p class="subtitle">Every day is a step closer to success!</p>
+
+        <div class="subject-countdowns" id="subjectCountdowns">
+            <!-- Countdowns will be generated by JavaScript -->
+        </div>
+
+        <div class="psle-info">
+            <h2>PSLE 2026 Exam Timetable (Tentative)</h2>
+            <p style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 1.5rem;">
+                Official calendar from <a href="https://file.go.gov.sg/2026-psle-exam-cal.pdf" target="_blank" rel="noopener noreferrer" style="color: #48dbfb; text-decoration: underline; font-weight: 600;">SEAB (PDF)</a> • Final timetable available 16 Feb 2026
+            </p>
+
+            <div style="margin-bottom: 1.5rem;">
+                <h3 style="font-size: 1.2rem; margin-bottom: 0.75rem; color: #ffc107;">📝 Registration Period</h3>
+                <p><strong>Tuesday, 14 April – Monday, 27 April 2026</strong></p>
+                <p style="font-size: 0.9rem;">School Candidates</p>
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <h3 style="font-size: 1.2rem; margin-bottom: 0.75rem; color: #48dbfb;">🗣️ Oral Examinations</h3>
+                <p><strong>Wednesday, 12 August & Thursday, 13 August 2026</strong></p>
+                <p style="font-size: 0.9rem;">Subjects: English, Mother Tongue Languages</p>
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <h3 style="font-size: 1.2rem; margin-bottom: 0.75rem; color: #9b59b6;">🎧 Listening Comprehension</h3>
+                <p><strong>Tuesday, 15 September 2026</strong></p>
+                <p style="font-size: 0.9rem;">Subjects: Mother Tongue Languages</p>
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <h3 style="font-size: 1.2rem; margin-bottom: 0.75rem; color: #ff6b6b;">✍️ Written Examinations</h3>
+                <p><strong>Thursday, 24 Sept – Friday, 25 Sept 2026</strong><br>
+                <strong>Monday, 28 Sept – Wednesday, 30 Sept 2026</strong></p>
+                <p style="font-size: 0.9rem;">Subjects: English, Mathematics, Science, Mother Tongue</p>
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <h3 style="font-size: 1.2rem; margin-bottom: 0.75rem; color: #58d68d;">📊 Marking Period</h3>
+                <p><strong>Monday, 12 Oct – Wednesday, 14 Oct 2026</strong></p>
+                <p style="font-size: 0.9rem;">School holiday for all primary students</p>
+            </div>
+
+            <p style="margin-top: 1.5rem; padding: 1rem; background: rgba(255, 193, 7, 0.2); border-left: 4px solid #ffc107; border-radius: 4px;">
+                <strong>💪 Stay prepared!</strong> Visit <a href="https://www.seab.gov.sg/" target="_blank" rel="noopener noreferrer" style="color: #48dbfb; text-decoration: underline;">SEAB</a> for updates and detailed timetable (available 16 Feb 2026).
+            </p>
+        </div>
+    </div>
+
+    <div class="right-panel">
+        <div class="todo-panel">
+            <h2>Learning Plan</h2>
+            <div class="todo-input-form">
+                <input type="text" class="todo-input" id="todoInput" placeholder="Add a task to your learning plan...">
+                <select class="todo-subject" id="todoSubject">
+                    <option value="english">English</option>
+                    <option value="mathematics">Mathematics</option>
+                    <option value="science">Science</option>
+                    <option value="mother-tongue">Mother Tongue</option>
+                    <option value="general">General</option>
+                </select>
+                <div class="todo-options">
+                    <select class="todo-priority" id="todoPriority">
+                        <option value="low">Low Priority</option>
+                        <option value="medium" selected>Medium Priority</option>
+                        <option value="high">High Priority</option>
+                    </select>
+                    <input type="date" class="todo-deadline" id="todoDeadline">
+                </div>
+                <button class="btn btn-add" onclick="addTodo()">Add Task</button>
+            </div>
+            <div class="todo-list" id="todoList"></div>
+            <div class="todo-count" id="todoCount">0 tasks</div>
+        </div>
+
+        <div class="calendar-panel">
+            <h2>Task Calendar</h2>
+            <div class="calendar-header">
+                <button class="btn-nav" onclick="changeMonth(-1)">&lt;</button>
+                <span class="calendar-month" id="calendarMonth">Month Year</span>
+                <button class="btn-nav" onclick="changeMonth(1)">&gt;</button>
+            </div>
+            <div class="calendar-grid" id="calendarGrid"></div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Task Popup Modal -->
+    <div class="task-popup" id="taskPopup" onclick="closePopup()">
+        <div class="popup-content" onclick="event.stopPropagation()">
+            <div class="popup-header">
+                <h3 id="popupDate">Tasks</h3>
+                <button class="popup-close" onclick="closePopup()">&times;</button>
+            </div>
+            <div class="popup-body" id="popupBody"></div>
+        </div>
+    </div>
+
+    <script>
+        // PSLE 2026 Subject Exam Dates (Official - Tentative)
+        const examSchedule = [
+            { subject: 'English & Mother Tongue', type: 'Oral', date: 'August 12, 2026 08:00:00', color: '#9b59b6' },
+            { subject: 'Mother Tongue', type: 'Listening', date: 'September 15, 2026 09:00:00', color: '#ec4899' },
+            { subject: 'English', type: 'Written', date: 'September 24, 2026 09:00:00', color: '#9b59b6' },
+            { subject: 'Mathematics', type: 'Written', date: 'September 25, 2026 09:00:00', color: '#3b82f6' },
+            { subject: 'Science', type: 'Written', date: 'September 28, 2026 09:00:00', color: '#10b981' },
+            { subject: 'Mother Tongue', type: 'Written', date: 'September 29, 2026 09:00:00', color: '#ec4899' }
+        ];
+
+        function updateSubjectCountdowns() {
+            const container = document.getElementById('subjectCountdowns');
+            const now = new Date().getTime();
+
+            // Find upcoming exams
+            const upcomingExams = examSchedule
+                .map(exam => ({
+                    ...exam,
+                    timestamp: new Date(exam.date).getTime(),
+                    distance: new Date(exam.date).getTime() - now
+                }))
+                .filter(exam => exam.distance > 0)
+                .sort((a, b) => a.distance - b.distance);
+
+            // Get the closest upcoming exam
+            const nextExam = upcomingExams[0];
+
+            if (!nextExam) {
+                container.innerHTML = `
+                    <div class="subject-countdown-item completed">
+                        <div class="countdown-completed-text" style="font-size: 1.5rem;">
+                            🎉 All PSLE 2026 Exams Completed! 🎉
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            const days = Math.floor(nextExam.distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((nextExam.distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((nextExam.distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((nextExam.distance % (1000 * 60)) / 1000);
+
+            const examDateObj = new Date(nextExam.date);
+            const dateStr = examDateObj.toLocaleDateString('en-SG', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            container.innerHTML = `
+                <div class="subject-countdown-item" style="border-left: 4px solid ${nextExam.color};">
+                    <div class="countdown-header">
+                        <span class="countdown-subject" style="color: ${nextExam.color};">Next Exam: ${nextExam.subject}</span>
+                        <span class="countdown-type">${nextExam.type}</span>
+                    </div>
+                    <div class="countdown-date">${dateStr} at 9:00 AM</div>
+                    <div class="countdown-timer">
+                        <div class="countdown-unit">
+                            <span class="countdown-value">${days}</span>
+                            <span class="countdown-label">Days</span>
+                        </div>
+                        <div class="countdown-unit">
+                            <span class="countdown-value">${hours.toString().padStart(2, '0')}</span>
+                            <span class="countdown-label">Hours</span>
+                        </div>
+                        <div class="countdown-unit">
+                            <span class="countdown-value">${minutes.toString().padStart(2, '0')}</span>
+                            <span class="countdown-label">Minutes</span>
+                        </div>
+                        <div class="countdown-unit">
+                            <span class="countdown-value">${seconds.toString().padStart(2, '0')}</span>
+                            <span class="countdown-label">Seconds</span>
+                        </div>
+                    </div>
+                    ${upcomingExams.length > 1 ? `<div style="text-align: center; margin-top: 1rem; font-size: 0.9rem; opacity: 0.8;">${upcomingExams.length - 1} more exam${upcomingExams.length - 1 !== 1 ? 's' : ''} remaining</div>` : ''}
+                </div>
+            `;
+        }
+
+        // Update countdown immediately
+        updateSubjectCountdowns();
+
+        // Update countdown every second
+        const countdownInterval = setInterval(updateSubjectCountdowns, 1000);
+
+        // Initialize Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDVXsfyCpDut_0XzdFD_vvpOSmdAVLp3B4",
+            authDomain: "psle-countdown.firebaseapp.com",
+            projectId: "psle-countdown",
+            storageBucket: "psle-countdown.firebasestorage.app",
+            messagingSenderId: "7190916340",
+            appId: "1:7190916340:web:22031bf5fe3efa532cc2a1"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const todosCollection = db.collection('todos');
+
+        // Todo List Management with Firebase Firestore
+        let todos = [];
+
+        // Load todos from Firestore
+        function loadTodos() {
+            todosCollection.orderBy('createdAt', 'desc').onSnapshot((snapshot) => {
+                todos = [];
+                snapshot.forEach((doc) => {
+                    todos.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                renderTodos();
+                renderCalendar(); // Update calendar when todos change
+            }, (error) => {
+                console.error('Error loading todos:', error);
+                // Fallback to empty array if error
+                todos = [];
+                renderTodos();
+            });
+        }
+
+        // Save is handled automatically by Firestore, but we keep this for compatibility
+        function saveTodos() {
+            // No longer needed - Firestore updates in real-time
+            renderCalendar();
+        }
+
+        // Add new todo
+        async function addTodo() {
+            const input = document.getElementById('todoInput');
+            const subjectSelect = document.getElementById('todoSubject');
+            const prioritySelect = document.getElementById('todoPriority');
+            const deadlineInput = document.getElementById('todoDeadline');
+
+            const text = input.value.trim();
+
+            if (text === '') {
+                alert('Please enter a task!');
+                return;
+            }
+
+            const todo = {
+                text: text,
+                subject: subjectSelect.value,
+                priority: prioritySelect.value,
+                deadline: deadlineInput.value || null,
+                completed: false,
+                createdAt: new Date().toISOString()
+            };
+
+            try {
+                await todosCollection.add(todo);
+
+                // Reset form
+                input.value = '';
+                subjectSelect.value = 'english';
+                prioritySelect.value = 'medium';
+                setDefaultDeadline();
+                input.focus();
+            } catch (error) {
+                console.error('Error adding todo:', error);
+                alert('Failed to add task. Please try again.');
+            }
+        }
+
+        // Toggle todo completion
+        async function toggleTodo(id) {
+            const todo = todos.find(t => t.id === id);
+            if (todo) {
+                try {
+                    await todosCollection.doc(id).update({
+                        completed: !todo.completed
+                    });
+                } catch (error) {
+                    console.error('Error toggling todo:', error);
+                    alert('Failed to update task. Please try again.');
+                }
+            }
+        }
+
+        // Delete todo
+        async function deleteTodo(id) {
+            try {
+                await todosCollection.doc(id).delete();
+            } catch (error) {
+                console.error('Error deleting todo:', error);
+                alert('Failed to delete task. Please try again.');
+            }
+        }
+
+        // Render todos to DOM
+        function renderTodos() {
+            const todoList = document.getElementById('todoList');
+            const todoCount = document.getElementById('todoCount');
+
+            if (todos.length === 0) {
+                todoList.innerHTML = '<div style="text-align: center; padding: 2rem; opacity: 0.6;">No tasks yet. Add your first learning goal!</div>';
+                todoCount.textContent = '0 tasks';
+                return;
+            }
+
+            // Sort todos by priority and deadline
+            const sortedTodos = sortTodos([...todos]);
+
+            todoList.innerHTML = sortedTodos.map(todo => {
+                const priorityClass = `priority-${todo.priority || 'medium'}`;
+                const subjectClass = `subject-${todo.subject || 'general'}`;
+                const deadlineInfo = formatDeadline(todo.deadline);
+
+                return `
+                    <div class="todo-item ${todo.completed ? 'completed' : ''} ${priorityClass}">
+                        <input
+                            type="checkbox"
+                            class="todo-checkbox"
+                            ${todo.completed ? 'checked' : ''}
+                            onchange="toggleTodo(${todo.id})"
+                        >
+                        <div class="todo-content">
+                            <div class="todo-text">${escapeHtml(todo.text)}</div>
+                            <div class="todo-meta">
+                                <span class="subject-badge ${subjectClass}">${formatSubject(todo.subject)}</span>
+                                <span class="priority-badge ${priorityClass}">${todo.priority || 'medium'}</span>
+                                ${deadlineInfo ? `<span class="deadline-display ${deadlineInfo.class}">${deadlineInfo.text}</span>` : ''}
+                            </div>
+                        </div>
+                        <button class="todo-delete" onclick="deleteTodo(${todo.id})">Delete</button>
+                    </div>
+                `;
+            }).join('');
+
+            const completedCount = todos.filter(t => t.completed).length;
+            todoCount.textContent = `${todos.length} task${todos.length !== 1 ? 's' : ''} (${completedCount} completed)`;
+        }
+
+        // Format subject display
+        function formatSubject(subject) {
+            const subjectNames = {
+                'english': 'English',
+                'mathematics': 'Math',
+                'science': 'Science',
+                'mother-tongue': 'Mother Tongue',
+                'general': 'General'
+            };
+            return subjectNames[subject] || 'General';
+        }
+
+        // Format deadline display
+        function formatDeadline(deadline) {
+            if (!deadline) return null;
+
+            const deadlineDate = new Date(deadline);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            deadlineDate.setHours(0, 0, 0, 0);
+
+            const diffTime = deadlineDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            let className = '';
+            let text = '';
+
+            if (diffDays < 0) {
+                className = 'overdue';
+                text = `Overdue by ${Math.abs(diffDays)} day${Math.abs(diffDays) !== 1 ? 's' : ''}`;
+            } else if (diffDays === 0) {
+                className = 'overdue';
+                text = 'Due Today!';
+            } else if (diffDays <= 3) {
+                className = 'soon';
+                text = `Due in ${diffDays} day${diffDays !== 1 ? 's' : ''}`;
+            } else {
+                text = `Due ${deadlineDate.toLocaleDateString('en-SG', { month: 'short', day: 'numeric' })}`;
+            }
+
+            return { class: className, text: text };
+        }
+
+        // Sort todos by priority and deadline
+        function sortTodos(todoArray) {
+            const priorityOrder = { high: 0, medium: 1, low: 2 };
+
+            return todoArray.sort((a, b) => {
+                // Completed tasks go to bottom
+                if (a.completed !== b.completed) {
+                    return a.completed ? 1 : -1;
+                }
+
+                // Sort by priority
+                const priorityDiff = priorityOrder[a.priority || 'medium'] - priorityOrder[b.priority || 'medium'];
+                if (priorityDiff !== 0) return priorityDiff;
+
+                // Sort by deadline (earlier first)
+                if (a.deadline && b.deadline) {
+                    return new Date(a.deadline) - new Date(b.deadline);
+                }
+                if (a.deadline) return -1;
+                if (b.deadline) return 1;
+
+                // Sort by creation time (newer first)
+                return new Date(b.createdAt) - new Date(a.createdAt);
+            });
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Allow Enter key to add todo
+        document.getElementById('todoInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addTodo();
+            }
+        });
+
+        // Set default deadline to today
+        function setDefaultDeadline() {
+            const deadlineInput = document.getElementById('todoDeadline');
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            deadlineInput.value = `${year}-${month}-${day}`;
+        }
+
+        // Load todos on page load
+        loadTodos();
+
+        // Set default deadline to today
+        setDefaultDeadline();
+
+        // Calendar functionality
+        let currentCalendarMonth = new Date().getMonth();
+        let currentCalendarYear = new Date().getFullYear();
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            const monthDisplay = document.getElementById('calendarMonth');
+
+            const firstDay = new Date(currentCalendarYear, currentCalendarMonth, 1);
+            const lastDay = new Date(currentCalendarYear, currentCalendarMonth + 1, 0);
+            const prevLastDay = new Date(currentCalendarYear, currentCalendarMonth, 0);
+
+            const firstDayIndex = firstDay.getDay();
+            const lastDate = lastDay.getDate();
+            const prevLastDate = prevLastDay.getDate();
+
+            monthDisplay.textContent = `${firstDay.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`;
+
+            let days = '';
+
+            // Day headers
+            const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            dayHeaders.forEach(day => {
+                days += `<div class="calendar-day-header">${day}</div>`;
+            });
+
+            // Previous month's days
+            for (let i = firstDayIndex; i > 0; i--) {
+                days += `<div class="calendar-day other-month">${prevLastDate - i + 1}</div>`;
+            }
+
+            // Current month's days
+            const today = new Date();
+            for (let i = 1; i <= lastDate; i++) {
+                const dateStr = `${currentCalendarYear}-${String(currentCalendarMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                const tasksForDate = todos.filter(todo => todo.deadline === dateStr);
+                const isToday = today.getDate() === i && today.getMonth() === currentCalendarMonth && today.getFullYear() === currentCalendarYear;
+                const hasTasks = tasksForDate.length > 0;
+
+                let classes = 'calendar-day';
+                if (isToday) classes += ' today';
+                if (hasTasks) classes += ' has-tasks';
+
+                days += `<div class="${classes}" onclick="showTasksForDate('${dateStr}')">${i}</div>`;
+            }
+
+            // Next month's days
+            const totalCells = firstDayIndex + lastDate;
+            const nextDays = 7 - (totalCells % 7);
+            if (nextDays < 7) {
+                for (let i = 1; i <= nextDays; i++) {
+                    days += `<div class="calendar-day other-month">${i}</div>`;
+                }
+            }
+
+            grid.innerHTML = days;
+        }
+
+        function changeMonth(direction) {
+            currentCalendarMonth += direction;
+            if (currentCalendarMonth > 11) {
+                currentCalendarMonth = 0;
+                currentCalendarYear++;
+            } else if (currentCalendarMonth < 0) {
+                currentCalendarMonth = 11;
+                currentCalendarYear--;
+            }
+            renderCalendar();
+        }
+
+        function showTasksForDate(dateStr) {
+            const tasksForDate = todos.filter(todo => todo.deadline === dateStr);
+
+            if (tasksForDate.length === 0) {
+                return; // Don't show popup if no tasks
+            }
+
+            const popup = document.getElementById('taskPopup');
+            const popupDate = document.getElementById('popupDate');
+            const popupBody = document.getElementById('popupBody');
+
+            const date = new Date(dateStr);
+            popupDate.textContent = `Tasks for ${date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`;
+
+            popupBody.innerHTML = tasksForDate.map(todo => {
+                const priorityClass = `priority-${todo.priority || 'medium'}`;
+                const subjectClass = `subject-${todo.subject || 'general'}`;
+
+                return `
+                    <div class="popup-task">
+                        <div class="popup-task-text">${escapeHtml(todo.text)}</div>
+                        <div class="popup-task-meta">
+                            <span class="subject-badge ${subjectClass}">${formatSubject(todo.subject)}</span>
+                            <span class="priority-badge ${priorityClass}">${todo.priority || 'medium'}</span>
+                            ${todo.completed ? '<span style="opacity: 0.7;">✓ Completed</span>' : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            popup.classList.add('active');
+        }
+
+        function closePopup() {
+            const popup = document.getElementById('taskPopup');
+            popup.classList.remove('active');
+        }
+
+        // Initialize calendar
+        renderCalendar();
+    </script>
+</body>
+</html>

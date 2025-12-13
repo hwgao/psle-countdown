@@ -142,6 +142,16 @@ function togglePsleInfo() {
   setPsleInfoExpanded(!expanded);
 }
 
+(function initBuildInfo() {
+  const commitEl = document.getElementById("buildCommit");
+  if (!commitEl) return;
+  const commit =
+    (window.buildInfo && window.buildInfo.commit) ? String(window.buildInfo.commit) : "";
+  if (commit) {
+    commitEl.textContent = commit;
+  }
+})();
+
 (function initPsleInfo() {
   let expanded = false;
   try {

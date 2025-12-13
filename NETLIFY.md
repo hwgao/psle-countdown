@@ -22,5 +22,6 @@ Values come from Firebase Console → Project settings → Your apps → SDK set
 
 ### 3) Local development
 
-Create `firebase-config.js` locally by copying `firebase-config.example.js`. Do not commit `firebase-config.js` (it is ignored by `.gitignore`).
+Option A: Create `firebase-config.js` locally by copying `firebase-config.example.js`. Do not commit `firebase-config.js` (it is ignored by `.gitignore`).
 
+Option B: Use `.env` + `./dev.sh` to generate `firebase-config.js` automatically (also ignored by `.gitignore`).

@@ -15,3 +15,15 @@ window.firebaseConfig = {
 };
 EOF
 
+# Build info (Netlify exposes COMMIT_REF)
+commit_ref="${COMMIT_REF:-}"
+commit_short="$(printf '%s' "$commit_ref" | cut -c1-7)"
+if [ -z "$commit_short" ]; then
+    commit_short="unknown"
+fi
+
+cat > build-info.js <<EOF
+window.buildInfo = {
+    commit: '${commit_short}'
+};
+EOF

@@ -10,26 +10,24 @@
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            gap: 2rem;
             padding: 2rem;
             color: white;
         }
 
         .main-wrapper {
             display: flex;
-            gap: 2rem;
-            max-width: 1400px;
+            flex-direction: column;
+            max-width: 1200px;
             width: 100%;
         }
 
         .container {
             text-align: center;
             padding: 2rem;
-            flex: 1;
-            max-width: 900px;
-            overflow-y: auto;
+            width: 100%;
             display: flex;
             flex-direction: column;
+            gap: 2rem;
         }
 
         h1 {
@@ -48,7 +46,6 @@
             display: flex;
             flex-direction: column;
             gap: 1.5rem;
-            margin-bottom: 2rem;
         }
 
         .subject-countdown-item {
@@ -132,15 +129,14 @@
             color: #58d68d;
         }
 
-            .psle-info {
-                margin-top: 3rem;
-                padding: 2rem;
-                background: rgba(255, 255, 255, 0.15);
-                backdrop-filter: blur(10px);
-                border-radius: 15px;
-                border: 1px solid rgba(255, 255, 255, 0.2);
-                text-align: left;
-            }
+        .psle-info {
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: left;
+        }
 
             .psle-info-header {
                 display: flex;
@@ -615,20 +611,40 @@
 
         .calendar-panel h2 {
             font-size: 1.5rem;
-            margin-bottom: 1rem;
-            text-align: center;
+            margin: 0;
+            text-align: left;
         }
 
-        .calendar-header {
+        .calendar-panel-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 1rem;
             margin-bottom: 1rem;
         }
 
-        .calendar-month {
-            font-size: 1.2rem;
-            font-weight: 600;
+        .calendar-nav {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .calendar-months {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .calendar-month-block {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .calendar-month-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 0.75rem;
+            opacity: 0.95;
         }
 
         .btn-nav {
@@ -799,16 +815,6 @@
 
         @media (max-width: 1200px) {
             .main-wrapper {
-                flex-direction: column;
-            }
-
-            .right-panel {
-                width: 100%;
-                min-width: auto;
-                max-height: none;
-            }
-
-            .container {
                 max-width: 100%;
             }
         }
@@ -837,5 +843,9 @@
 
             .container {
                 padding: 1rem;
+            }
+
+            .calendar-months {
+                flex-direction: column;
             }
         }

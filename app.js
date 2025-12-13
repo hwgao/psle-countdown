@@ -528,19 +528,20 @@
         let currentCalendarMonth = new Date().getMonth();
         let currentCalendarYear = new Date().getFullYear();
 
-        function renderCalendar() {
-            const grid = document.getElementById('calendarGrid');
-            const monthDisplay = document.getElementById('calendarMonth');
+        function renderMonth(gridId, monthTitleId, year, month) {
+            const grid = document.getElementById(gridId);
+            const monthTitle = document.getElementById(monthTitleId);
+            if (!grid || !monthTitle) return;
 
-            const firstDay = new Date(currentCalendarYear, currentCalendarMonth, 1);
-            const lastDay = new Date(currentCalendarYear, currentCalendarMonth + 1, 0);
-            const prevLastDay = new Date(currentCalendarYear, currentCalendarMonth, 0);
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const prevLastDay = new Date(year, month, 0);
 
             const firstDayIndex = firstDay.getDay();
             const lastDate = lastDay.getDate();
             const prevLastDate = prevLastDay.getDate();
 
-            monthDisplay.textContent = `${firstDay.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`;
+            monthTitle.textContent = `${firstDay.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`;
 
             let days = '';
 
@@ -558,9 +559,9 @@
             // Current month's days
             const today = new Date();
             for (let i = 1; i <= lastDate; i++) {
-                const dateStr = `${currentCalendarYear}-${String(currentCalendarMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
                 const tasksForDate = todos.filter(todo => todo.deadline === dateStr);
-                const isToday = today.getDate() === i && today.getMonth() === currentCalendarMonth && today.getFullYear() === currentCalendarYear;
+                const isToday = today.getDate() === i && today.getMonth() === month && today.getFullYear() === year;
                 const hasTasks = tasksForDate.length > 0;
 
                 let classes = 'calendar-day';
@@ -580,6 +581,14 @@
             }
 
             grid.innerHTML = days;
+        }
+
+        function renderCalendar() {
+            const baseDate = new Date(currentCalendarYear, currentCalendarMonth, 1);
+            const nextDate = new Date(currentCalendarYear, currentCalendarMonth + 1, 1);
+
+            renderMonth('calendarGrid1', 'calendarMonth1', baseDate.getFullYear(), baseDate.getMonth());
+            renderMonth('calendarGrid2', 'calendarMonth2', nextDate.getFullYear(), nextDate.getMonth());
         }
 
         function changeMonth(direction) {

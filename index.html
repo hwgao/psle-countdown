@@ -1082,7 +1082,7 @@
                             type="checkbox"
                             class="todo-checkbox"
                             ${todo.completed ? 'checked' : ''}
-                            onchange="toggleTodo(${todo.id})"
+                            onchange="toggleTodo('${todo.id}')"
                         >
                         <div class="todo-content">
                             <div class="todo-text">${escapeHtml(todo.text)}</div>
@@ -1092,7 +1092,7 @@
                                 ${deadlineInfo ? `<span class="deadline-display ${deadlineInfo.class}">${deadlineInfo.text}</span>` : ''}
                             </div>
                         </div>
-                        <button class="todo-delete" onclick="deleteTodo(${todo.id})">Delete</button>
+                        <button class="todo-delete" onclick="deleteTodo('${todo.id}')">Delete</button>
                     </div>
                 `;
             }).join('');

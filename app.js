@@ -86,7 +86,7 @@ function updateSubjectCountdowns() {
   container.innerHTML = `
                 <div class="subject-countdown-item" style="border-left: 4px solid ${nextExam.color};">
                     <div class="countdown-header">
-                        <span class="countdown-subject" style="color: ${nextExam.color};">Next Exam: ${nextExam.subject}</span>
+                        <span class="countdown-subject"><span class="countdown-subject-label">Next Exam:</span> <span class="countdown-subject-name" style="--accent: ${nextExam.color};">${nextExam.subject}</span></span>
                         <span class="countdown-type">${nextExam.type}</span>
                     </div>
                     <div class="countdown-date">${dateStr} at 9:00 AM</div>

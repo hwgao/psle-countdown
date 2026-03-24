@@ -1,4 +1,4 @@
-// PSLE 2026 Subject Exam Dates (Official - Tentative)
+// PSLE 2026 Subject Exam Dates (Official - Updated as at 13 February 2026)
 const examSchedule = [
   {
     subject: "English & Mother Tongue",
@@ -15,26 +15,32 @@ const examSchedule = [
   {
     subject: "English",
     type: "Written",
-    date: "September 24, 2026 09:00:00",
+    date: "September 24, 2026 08:15:00",
     color: "#9b59b6",
   },
   {
     subject: "Mathematics",
     type: "Written",
-    date: "September 25, 2026 09:00:00",
+    date: "September 25, 2026 08:15:00",
     color: "#3b82f6",
-  },
-  {
-    subject: "Science",
-    type: "Written",
-    date: "September 28, 2026 09:00:00",
-    color: "#10b981",
   },
   {
     subject: "Mother Tongue",
     type: "Written",
-    date: "September 29, 2026 09:00:00",
+    date: "September 28, 2026 08:15:00",
     color: "#ec4899",
+  },
+  {
+    subject: "Science",
+    type: "Written",
+    date: "September 29, 2026 08:15:00",
+    color: "#10b981",
+  },
+  {
+    subject: "Higher Mother Tongue",
+    type: "Written",
+    date: "September 30, 2026 08:15:00",
+    color: "#f59e0b",
   },
 ];
 
